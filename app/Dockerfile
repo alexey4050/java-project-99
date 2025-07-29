@@ -14,8 +14,8 @@ ENV PATH=$PATH:$GRADLE_HOME/bin
 WORKDIR /app
 
 COPY gradle gradle
-COPY build.gradle .
-COPY settings.gradle .
+COPY build.gradle.kts .
+COPY settings.gradle.kts .
 COPY gradlew .
 
 RUN ./gradlew dependencies --no-daemon
