@@ -23,7 +23,7 @@ RUN ./gradlew dependencies --no-daemon
 
 COPY src src
 
-RUN ./gradlew build --no-daemon
+RUN ./gradlew --no-daemon build
 
 FROM eclipse-temurin:21-jdk
 
