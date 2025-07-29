@@ -1,4 +1,4 @@
-FROM eclipse-temurin:20-jdk
+FROM eclipse-temurin:21-jdk
 
 ARG GRADLE_VERSION=8.10
 
@@ -20,4 +20,4 @@ COPY /app .
 
 RUN gradle installDist
 
-CMD ./build/install/app/bin/app
+CMD java -jar build/libs/app-0.0.1-SNAPSHOT.jar
