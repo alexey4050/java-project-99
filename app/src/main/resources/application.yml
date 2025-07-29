@@ -1,7 +1,12 @@
 spring:
-  datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
-server:
-  port: ${PORT:8080}
+  profiles:
+    activate: dev
+
+  jpa:
+    show-sql: true
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+    output:
+      ansi:
+        enabled: always
