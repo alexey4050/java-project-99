@@ -9,6 +9,7 @@ import hexlet.code.repository.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,7 +32,10 @@ public class UserController {
     @Autowired
     private UserMapper userMapper;
 
-    @GetMapping("/user")
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @GetMapping("/users")
     public List<UserDTO> index() {
         var users = userRepository.findAll();
         return users.stream()
@@ -39,7 +43,7 @@ public class UserController {
                 .toList();
     }
 
-    @GetMapping("/user/{id}")
+    @GetMapping("/users/{id}")
     public UserDTO show(@PathVariable Long id) {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id "
@@ -48,26 +52,32 @@ public class UserController {
         return userData;
     }
 
-    @PostMapping("/user")
+    @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
     public UserDTO create(@Valid @RequestBody UserCreateDTO userData) {
         var user = userMapper.map(userData);
+        user.setPassword(passwordEncoder.encode(userData.getPassword()));
         userRepository.save(user);
         return userMapper.map(user);
     }
 
-    @PutMapping("/user/{id}")
+    @PutMapping("/users/{id}")
     public UserDTO update(@PathVariable Long id,
                           @Valid @RequestBody UserUpdateDTO userData) {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id "
                         + id + " not found"));
+
+        if (userData.getPassword() != null && userData.getPassword().isPresent()) {
+            user.setPassword(passwordEncoder.encode(userData.getPassword().get()));
+        }
+
         userMapper.update(userData, user);
         userRepository.save(user);
         return userMapper.map(user);
     }
 
-    @DeleteMapping("user/{id}")
+    @DeleteMapping("users/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
         userRepository.deleteById(id);

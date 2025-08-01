@@ -10,10 +10,8 @@ spring:
     output:
       ansi:
         enabled: always
-    server:
-      address: 0.0.0.0
-      port: ${PORT:8080}
 
-  rsa:
-    private-key: classpath:certs/private.pem
-    public-key: classpath:certs/public.pem
+    logging:
+      level:
+        org.springframework.web: DEBUG
+        hexlet.code: TRACE
