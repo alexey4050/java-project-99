@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -94,7 +95,7 @@ public class UserControllerTest {
         User user = new User();
         user.setEmail("protected@example.com");
         user.setPassword(passwordEncoder.encode("password"));
-        userRepository.save(user);
+        user = userRepository.save(user);
 
         String token = jwtUtils.generateToken(user.getEmail());
 
@@ -102,7 +103,7 @@ public class UserControllerTest {
                         .header("Authorization", "Bearer " + token))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.email").value("protected@example.com"));
+                .andExpect(jsonPath("$.email").value(user.getEmail()));
     }
 
     @Test
@@ -119,6 +120,9 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.firstName").value("Partial"))
                 .andExpect(jsonPath("$.lastName").value("User")) // Осталось прежним
                 .andExpect(jsonPath("$.email").value("test@example.com"));
+
+        User updatedUser = userRepository.findById(testUser.getId()).orElseThrow();
+        assertEquals("Partial", updatedUser.getFirstName());
     }
 
     @Test
