@@ -6,7 +6,10 @@ import hexlet.code.dto.UserUpdateDTO;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.UserMapper;
 import hexlet.code.repository.UserRepository;
+import hexlet.code.utils.UserUtils;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,6 +38,9 @@ public class UserController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private UserUtils userUtils;
+
     @GetMapping("/users")
     public List<UserDTO> index() {
         var users = userRepository.findAll();
@@ -48,8 +54,7 @@ public class UserController {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id "
                         + id + " not found"));
-        var userData = userMapper.map(user);
-        return userData;
+        return userMapper.map(user);
     }
 
     @PostMapping("/users")
@@ -62,11 +67,18 @@ public class UserController {
     }
 
     @PutMapping("/users/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("@userUtils.isAuthor(#id)")
     public UserDTO update(@PathVariable Long id,
-                          @Valid @RequestBody UserUpdateDTO userData) {
+                          @Valid @RequestBody UserUpdateDTO userData,
+                          Authentication authentication) {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id "
                         + id + " not found"));
+
+        if (userData.getEmail() != null && userData.getEmail().isPresent()) {
+            user.setEmail(userData.getEmail().get());
+        }
 
         if (userData.getPassword() != null && userData.getPassword().isPresent()) {
             user.setPassword(passwordEncoder.encode(userData.getPassword().get()));
@@ -79,6 +91,7 @@ public class UserController {
 
     @DeleteMapping("users/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("@userUtils.isAuthor(#id)")
     public void delete(@PathVariable Long id) {
         userRepository.deleteById(id);
     }

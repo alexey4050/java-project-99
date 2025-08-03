@@ -1,3 +1,8 @@
+logging:
+  level:
+    org.springframework.web: DEBUG
+    hexlet.code: TRACE
+
 spring:
   profiles:
     activate: dev
@@ -11,7 +16,6 @@ spring:
       ansi:
         enabled: always
 
-    logging:
-      level:
-        org.springframework.web: DEBUG
-        hexlet.code: TRACE
+rsa:
+  public-key: classpath:certs/public.pem
+  private-key: classpath:certs/private.pem
