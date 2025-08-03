@@ -8,6 +8,8 @@ import hexlet.code.mapper.UserMapper;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.utils.UserUtils;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,11 +44,16 @@ public class UserController {
     private UserUtils userUtils;
 
     @GetMapping("/users")
-    public List<UserDTO> index() {
+    public ResponseEntity<List<UserDTO>> index() {
         var users = userRepository.findAll();
-        return users.stream()
+        var userDTOs = users.stream()
                 .map(p -> userMapper.map(p))
                 .toList();
+        var headers = new HttpHeaders();
+        headers.add("X-Total-Count", String.valueOf(users.size()));
+
+        return new ResponseEntity<>(userDTOs, headers, HttpStatus.OK);
+
     }
 
     @GetMapping("/users/{id}")
