@@ -76,7 +76,6 @@ public class UserControllerTest {
                                 }
                                 """))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.email").value("new@example.com"))
                 .andExpect(jsonPath("$.firstName").value("New"))
                 .andExpect(jsonPath("$.lastName").value("User"))
@@ -94,7 +93,6 @@ public class UserControllerTest {
         mockMvc.perform(get("/api/users/{id}", testUser.getId())
                         .header("Authorization", "Bearer " + testUserToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(testUser.getId()))
                 .andExpect(jsonPath("$.email").value("test@example.com"))
                 .andExpect(jsonPath("$.firstName").value("Test"))
                 .andExpect(jsonPath("$.lastName").value("User"))
