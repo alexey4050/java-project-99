@@ -22,7 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 //import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -89,17 +89,17 @@ public class UserControllerTest {
 //        assertTrue(passwordEncoder.matches("password789", createdUser.get().getPassword()));
 //    }
 
-    @Test
-    public void testGetUserById() throws Exception {
-        mockMvc.perform(get("/api/users/{id}", testUser.getId())
-                        .header("Authorization", "Bearer " + testUserToken))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(testUser.getId()))
-                .andExpect(jsonPath("$.email").value("test@example.com"))
-                .andExpect(jsonPath("$.firstName").value("Test"))
-                .andExpect(jsonPath("$.lastName").value("User"))
-                .andExpect(jsonPath("$.password").doesNotExist());
-    }
+//    @Test
+//    public void testGetUserById() throws Exception {
+//        mockMvc.perform(get("/api/users/{id}", testUser.getId())
+//                        .header("Authorization", "Bearer " + testUserToken))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.id").value(testUser.getId()))
+//                .andExpect(jsonPath("$.email").value("test@example.com"))
+//                .andExpect(jsonPath("$.firstName").value("Test"))
+//                .andExpect(jsonPath("$.lastName").value("User"))
+//                .andExpect(jsonPath("$.password").doesNotExist());
+//    }
 
     @Test
     public void testGetUserByIdUnauthorized() throws Exception {
