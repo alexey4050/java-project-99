@@ -6,7 +6,9 @@ build/
 !**/src/test/**/build/
 app/.gradle
 app/build
-app/node_modules
+node_modules
+private.pem
+public.pem
 
 ### STS ###
 .apt_generated
