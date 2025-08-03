@@ -41,12 +41,8 @@ public class UserControllerTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-
     private User testUser;
-    private User anotherUser;
     private String testUserToken;
-    private String anotherUserToken;
-
 
     @BeforeEach
     public void setup() {
