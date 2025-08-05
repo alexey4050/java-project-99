@@ -1,6 +1,7 @@
 package hexlet.code.controller.api;
 
 import hexlet.code.model.User;
+import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.utils.JwtUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -9,20 +10,20 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.http.MediaType;
+import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
-//import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.MvcResult;
 //
-//import java.util.Optional;
+import java.util.Optional;
 //
 //import static org.junit.jupiter.api.Assertions.assertEquals;
-//import static org.junit.jupiter.api.Assertions.assertTrue;
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 //import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -36,6 +37,9 @@ public class UserControllerTest {
     private UserRepository userRepository;
 
     @Autowired
+    private TaskStatusRepository statusRepository;
+
+    @Autowired
     private JwtUtils jwtUtils;
 
     @Autowired
@@ -47,6 +51,7 @@ public class UserControllerTest {
     @BeforeEach
     public void setup() {
         userRepository.deleteAll();
+
 
         testUser = new User();
         testUser.setEmail("test@example.com");
@@ -63,31 +68,31 @@ public class UserControllerTest {
         userRepository.deleteAll();
     }
 
-//    @Test
-//    public void testCreateUser() throws Exception {
-//        MvcResult result = mockMvc.perform(post("/api/users")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content("""
-//                                {
-//                                    "email": "new@example.com",
-//                                    "password": "password789",
-//                                    "firstName": "New",
-//                                    "lastName": "User"
-//                                }
-//                                """))
-//                .andExpect(status().isCreated())
-//                .andExpect(jsonPath("$.id").exists())
-//                .andExpect(jsonPath("$.email").value("new@example.com"))
-//                .andExpect(jsonPath("$.firstName").value("New"))
-//                .andExpect(jsonPath("$.lastName").value("User"))
-//                .andExpect(jsonPath("$.password").doesNotExist())
-//                .andReturn();
-//
-//        String email = "new@example.com";
-//        Optional<User> createdUser = userRepository.findByEmail(email);
-//        assertTrue(createdUser.isPresent());
-//        assertTrue(passwordEncoder.matches("password789", createdUser.get().getPassword()));
-//    }
+    @Test
+    public void testCreateUser() throws Exception {
+        MvcResult result = mockMvc.perform(post("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "email": "new@example.com",
+                                    "password": "password789",
+                                    "firstName": "New",
+                                    "lastName": "User"
+                                }
+                                """))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.email").value("new@example.com"))
+                .andExpect(jsonPath("$.firstName").value("New"))
+                .andExpect(jsonPath("$.lastName").value("User"))
+                .andExpect(jsonPath("$.password").doesNotExist())
+                .andReturn();
+
+        String email = "new@example.com";
+        Optional<User> createdUser = userRepository.findByEmail(email);
+        assertTrue(createdUser.isPresent());
+        assertTrue(passwordEncoder.matches("password789", createdUser.get().getPassword()));
+    }
 
 //    @Test
 //    public void testGetUserById() throws Exception {
