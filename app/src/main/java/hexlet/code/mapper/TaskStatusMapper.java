@@ -27,5 +27,7 @@ public abstract class TaskStatusMapper {
 
     public abstract TaskStatusDTO map(TaskStatus model);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
     public abstract void update(TaskStatusUpdateDTO data, @MappingTarget TaskStatus model);
 }
