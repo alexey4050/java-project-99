@@ -43,9 +43,6 @@ public class TaskStatusController {
         var headers = new HttpHeaders();
         headers.add("X-Total-Count", String.valueOf(statuses.size()));
         return new ResponseEntity<>(result, headers, HttpStatus.OK);
-//        return ResponseEntity.ok()
-//                .header("X-Total-Count", String.valueOf(result.size()))
-//                .body(result);
     }
 
     @GetMapping("/task_statuses/{id}")

@@ -9,6 +9,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.Mapping;
 
 @Mapper(
         uses = {JsonNullableMapper.class},
@@ -18,6 +19,8 @@ import org.mapstruct.MappingTarget;
 )
 public abstract class TaskStatusMapper {
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
     public abstract TaskStatus map(TaskStatusCreateDTO data);
 
     public abstract TaskStatus map(TaskStatusDTO data);

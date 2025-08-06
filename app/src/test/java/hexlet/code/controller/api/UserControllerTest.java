@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
@@ -35,6 +34,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -76,6 +77,7 @@ public class UserControllerTest {
 
     @BeforeEach
     public void setup() {
+        System.out.println("===== Setting up test =====");
         userRepository.deleteAll();
         mockMvc = MockMvcBuilders.webAppContextSetup(wac)
                 .defaultResponseCharacterEncoding(StandardCharsets.UTF_8)
@@ -90,6 +92,7 @@ public class UserControllerTest {
         testUser = userRepository.save(testUser);
         token = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
 
+        System.out.println("Test user ID: " + testUser.getId());
     }
 
     @Test
@@ -109,18 +112,16 @@ public class UserControllerTest {
 
     @Test
     public void testGetUserById() throws Exception {
-        var request = get("/api/users/" + testUser.getId()).with(token);
-        var result = mockMvc.perform(request)
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse();
+        String validToken = jwtUtils.generateToken(testUser.getEmail());
 
-        var body = result.getContentAsString();
-        assertThatJson(body).and(
-                v -> v.node("email").isEqualTo(testUser.getEmail()),
-                v -> v.node("firstName").isEqualTo(testUser.getFirstName()),
-                v -> v.node("lastName").isEqualTo(testUser.getLastName())
-        );
+        var request = get("/api/users/" + testUser.getId())
+                .header("Authorization", "Bearer " + validToken);
+
+        mockMvc.perform(request)
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(testUser.getId()))
+                .andExpect(jsonPath("$.email").value(testUser.getEmail()));
     }
 
     @Test

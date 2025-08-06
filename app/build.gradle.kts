@@ -3,6 +3,8 @@ plugins {
 	checkstyle
 	id("org.springframework.boot") version "3.5.4"
 	id("io.spring.dependency-management") version "1.1.7"
+	id("org.sonarqube") version "6.2.0.5505"
+	jacoco
 }
 
 group = "hexlet.code"
@@ -49,4 +51,22 @@ dependencies {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+jacoco {
+	toolVersion = "0.8.12"
+}
+
+tasks.jacocoTestReport {
+	dependsOn(tasks.test)
+	reports {
+		xml.required.set(true)
+		html.required = true
+		csv.required.set(false)
+		html.outputLocation = layout.buildDirectory.dir("jacocoHtml")
+	}
+}
+
+tasks.check {
+	dependsOn(tasks.jacocoTestCoverageVerification)
 }
