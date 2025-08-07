@@ -29,5 +29,5 @@ jobs:
       - name: Upload to Qlty.sh
         uses: qltysh/qlty-action/coverage@v1
         with:
-          files: /home/runner/work/java-project-72/java-project-72/app/build/reports/jacoco/test/jacocoTestReport.xml
           token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
+          files: app/build/reports/coverage.xml
