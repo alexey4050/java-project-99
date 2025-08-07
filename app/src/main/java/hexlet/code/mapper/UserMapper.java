@@ -22,7 +22,7 @@ public abstract class UserMapper {
     @Mapping(target = "password", ignore = true)
     public abstract User map(UserCreateDTO data);
 
-    //@Mapping(source = "email", target = "email")
+    @Mapping(source = "email", target = "email")
     public abstract User map(UserDTO data);
 
     public abstract UserDTO map(User data);
