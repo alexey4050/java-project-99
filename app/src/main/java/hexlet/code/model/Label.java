@@ -1,12 +1,14 @@
 package hexlet.code.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.EqualsAndHashCode;
@@ -16,29 +18,30 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
-@Table(name = "task_statuses")
+@Table(name = "labels")
 @EntityListeners(AuditingEntityListener.class)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Getter
 @Setter
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class TaskStatus implements BaseEntity {
+public class Label implements BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     private Long id;
 
     @NotBlank
-    @Size(min = 1)
-    @Column(unique = true)
+    @Size(min = 3, max = 1000)
+    @Column(unique = true, nullable = false)
     private String name;
-
-    @NotBlank
-    @Size(min = 1)
-    @Column(unique = true)
-    private String slug;
 
     @CreatedDate
     private LocalDate createdAt;
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "labels")
+    private Set<Task> tasks = new HashSet<>();
 }

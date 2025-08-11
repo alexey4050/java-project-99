@@ -1,7 +1,9 @@
 package hexlet.code.component;
 
+import hexlet.code.model.Label;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.model.User;
+import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -25,6 +28,9 @@ public class DataInitializer implements ApplicationRunner {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private LabelRepository labelRepository;
+
     @Override
     public void run(ApplicationArguments args) {
         var adminEmail = "hexlet@example.com";
@@ -34,6 +40,7 @@ public class DataInitializer implements ApplicationRunner {
             admin.setPassword(passwordEncoder.encode("qwerty"));
             userRepository.save(admin);
             initDefaultStatuses();
+            initDefaultLabels();
         }
     }
 
@@ -57,5 +64,17 @@ public class DataInitializer implements ApplicationRunner {
             }
         });
         System.out.println("Total statuses: " + statusRepository.count());
+    }
+
+    private void initDefaultLabels() {
+        var defaultLabels = List.of("feature", "bug");
+        defaultLabels.forEach(name -> {
+            if (labelRepository.findByName(name).isEmpty()) {
+                var label = new Label();
+                label.setName(name);
+                System.out.println("Label name before save: " + label.getName());
+                labelRepository.save(label);
+            }
+        });
     }
 }

@@ -19,10 +19,10 @@ import org.mapstruct.Mapping;
 )
 public abstract class TaskStatusMapper {
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
     public abstract TaskStatus map(TaskStatusCreateDTO data);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
     public abstract TaskStatus map(TaskStatusDTO data);
 
     public abstract TaskStatusDTO map(TaskStatus model);
