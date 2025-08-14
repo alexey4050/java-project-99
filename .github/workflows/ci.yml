@@ -35,7 +35,7 @@ jobs:
         run: ./gradlew test
 
       - name: Generate coverage report
-        run: make report
+        run: /gradlew -p ./app jacocoTestReport
 
       - name: Upload to Qlty.sh
         uses: qltysh/qlty-action/coverage@v1
@@ -49,13 +49,16 @@ jobs:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
+
       - name: Cache Gradle packages
         uses: actions/cache@v4
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle
+
       - name: Build and analyze
+        working-directory: ./app
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./gradlew build sonar --info
@@ -71,6 +74,7 @@ jobs:
 
       - name: Build Docker image
         if: github.ref == 'refs/heads/main'
+        working-directory: ./app
         run: |
           docker build -t my-app:latest ./app
           echo "SENTRY_DSN=$SENTRY_DSN" >> .env
