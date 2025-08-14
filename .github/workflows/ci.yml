@@ -28,8 +28,9 @@ jobs:
         with:
           arguments: build
 
-      - name: Run tests
-        run: ./gradlew test
+      - name: Run tests with debug
+        run: |
+          ./gradlew test --debug
 
       - name: Generate coverage report
         run: make report
