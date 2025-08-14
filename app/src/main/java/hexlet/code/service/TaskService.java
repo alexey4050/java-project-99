@@ -1,6 +1,7 @@
 package hexlet.code.service;
 
 import hexlet.code.dto.TaskCreateDTO;
+import hexlet.code.dto.TaskFilterParams;
 import hexlet.code.dto.TaskUpdateDTO;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.TaskMapper;
@@ -10,6 +11,7 @@ import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
+import hexlet.code.specification.TaskSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +36,9 @@ public class TaskService {
 
     @Autowired
     private LabelRepository labelRepository;
+
+    @Autowired
+    private TaskSpecification taskSpecification;
 
     public List<Task> getAll() {
         return taskRepository.findAll();
@@ -83,5 +88,10 @@ public class TaskService {
         task.getLabels().clear();
         taskRepository.save(task);
         taskRepository.deleteById(id);
+    }
+
+    public List<Task> getAllFiltered(TaskFilterParams filterParams) {
+        var specific = taskSpecification.build(filterParams);
+        return taskRepository.findAll(specific);
     }
 }

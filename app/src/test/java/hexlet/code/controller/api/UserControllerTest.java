@@ -5,10 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.dto.UserDTO;
 import hexlet.code.mapper.UserMapper;
 import hexlet.code.model.User;
+import hexlet.code.repository.LabelRepository;
+import hexlet.code.repository.TaskRepository;
+import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
+import hexlet.code.util.ModelGenerator;
 import hexlet.code.utils.JwtUtils;
 import org.instancio.Instancio;
-import org.instancio.Select;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +24,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -62,33 +65,34 @@ public class UserControllerTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private LabelRepository labelRepository;
+
+    @Autowired
+    private TaskRepository taskRepository;
+
+    @Autowired
+    private TaskStatusRepository statusRepository;
+
+
+    @Autowired
+    private ModelGenerator modelGenerator;
+
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
     private User testUser;
 
-    private User genUser(String email) {
-        return Instancio.of(User.class)
-                .ignore(Select.field(User::getId))
-                .ignore(Select.field(User::getCreatedAt))
-                .ignore(Select.field(User::getUpdatedAt))
-                .supply(Select.field(User::getEmail), () -> email)
-                .supply(Select.field(User::getPassword), () -> "password123")
-                .create();
-    }
-
     @BeforeEach
     public void setup() {
-        System.out.println("===== Setting up test =====");
+        taskRepository.deleteAll();
+        labelRepository.deleteAll();
+        statusRepository.deleteAll();
         userRepository.deleteAll();
+
         mockMvc = MockMvcBuilders.webAppContextSetup(wac)
-                .defaultResponseCharacterEncoding(StandardCharsets.UTF_8)
                 .apply(springSecurity())
                 .build();
 
-        testUser = new User();
-        testUser.setEmail("test@example.com");
-        testUser.setPassword(passwordEncoder.encode("password123"));
-        testUser.setFirstName("Test");
-        testUser.setLastName("User");
+        testUser = Instancio.of(modelGenerator.getUserModel()).create();
         testUser = userRepository.save(testUser);
         token = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
 
@@ -97,18 +101,43 @@ public class UserControllerTest {
 
     @Test
     public void testCreateUser() throws Exception {
-        User newUser = genUser("new@example.com");
+        User newUser = Instancio.of(modelGenerator.getUserModel()).create();
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("email", newUser.getEmail());
+        data.put("firstName", newUser.getFirstName());
+        data.put("lastName", newUser.getLastName());
+        data.put("password", "rawPassword123");
+
         var request = post("/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(newUser));
+                .content(om.writeValueAsString(data));
 
         mockMvc.perform(request)
                 .andExpect(status().isCreated());
 
         Optional<User> createdUser = userRepository.findByEmail(newUser.getEmail());
         assertTrue(createdUser.isPresent());
-        assertTrue(passwordEncoder.matches("password123", createdUser.get().getPassword()));
+        assertTrue(passwordEncoder.matches("rawPassword123", createdUser.get().getPassword()));
     }
+
+    @Test
+    public void testGetAllUsers() throws Exception {
+        User anotherUser = Instancio.of(modelGenerator.getUserModel()).create();
+        anotherUser.setPassword(passwordEncoder.encode("password456"));
+        userRepository.save(anotherUser);
+
+        var request = get("/api/users").with(token);
+        var result = mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse();
+
+        var body = result.getContentAsString();
+        List<UserDTO> userDTOs = om.readValue(body, new TypeReference<>() { });
+        assertThat(userDTOs).hasSize(2);
+    }
+
 
     @Test
     public void testGetUserById() throws Exception {
@@ -130,23 +159,6 @@ public class UserControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
-    @Test
-    public void testGetAllUsers() throws Exception {
-        User anotherUser = genUser("another@example.com");
-        anotherUser.setPassword(passwordEncoder.encode("password456"));
-        userRepository.save(anotherUser);
-
-        var request = get("/api/users").with(token);
-        var result = mockMvc.perform(request)
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse();
-
-        var body = result.getContentAsString();
-        List<UserDTO> userDTOs = om.readValue(body, new TypeReference<>() {
-        });
-        assertThat(userDTOs).hasSize(2);
-    }
 
     @Test
     public void testPartialUpdateUser() throws Exception {

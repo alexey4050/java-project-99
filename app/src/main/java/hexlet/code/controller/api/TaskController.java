@@ -2,6 +2,7 @@ package hexlet.code.controller.api;
 
 import hexlet.code.dto.TaskCreateDTO;
 import hexlet.code.dto.TaskDTO;
+import hexlet.code.dto.TaskFilterParams;
 import hexlet.code.dto.TaskUpdateDTO;
 import hexlet.code.mapper.TaskMapper;
 import hexlet.code.service.TaskService;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,8 +34,19 @@ public class TaskController {
     private TaskMapper taskMapper;
 
     @GetMapping("/tasks")
-    public ResponseEntity<List<TaskDTO>> index() {
-        var tasks = taskService.getAll();
+    public ResponseEntity<List<TaskDTO>> index(
+            @RequestParam(required = false) String titleCont,
+            @RequestParam(required = false) Long assigneeId,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) Long labelId
+    ) {
+        var filterParam = new TaskFilterParams();
+        filterParam.setTitleCont(titleCont);
+        filterParam.setAssigneeId(assigneeId);
+        filterParam.setStatus(status);
+        filterParam.setLabelId(labelId);
+
+        var tasks = taskService.getAllFiltered(filterParam);
         var taskDTOs = tasks.stream()
                 .map(taskMapper::map)
                 .toList();
