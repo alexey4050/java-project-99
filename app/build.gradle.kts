@@ -6,6 +6,7 @@ plugins {
 	id("io.spring.dependency-management") version "1.1.7"
 	id("io.freefair.lombok") version "8.6"
 	id("org.sonarqube") version "6.2.0.5505"
+	id("io.sentry.jvm.gradle") version "5.9.0"
 }
 
 group = "hexlet.code"
@@ -41,8 +42,7 @@ dependencies {
 	implementation("org.openapitools:jackson-databind-nullable:0.2.6")
 	runtimeOnly("org.postgresql:postgresql")
 	runtimeOnly("com.h2database:h2")
-//	compileOnly("org.projectlombok:lombok")
-//	annotationProcessor("org.projectlombok:lombok")
+
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -51,6 +51,9 @@ dependencies {
 	testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
 	testImplementation("net.javacrumbs.json-unit:json-unit-assertj:3.2.2")
 	testImplementation("org.instancio:instancio-junit:3.3.0")
+
+//	implementation("io.sentry:sentry-spring-boot-starter:8.19.1")
+//	implementation("io.sentry:sentry-logback:8.19.1")
 }
 
 tasks.withType<Test> {
@@ -73,4 +76,26 @@ tasks.jacocoTestReport {
 
 tasks.check {
 	dependsOn(tasks.jacocoTestCoverageVerification)
+}
+
+sonar {
+	properties {
+		property("sonar.projectKey", "alexey4050_java-project-99")
+		property("sonar.organization", "alexey4050")
+		property("sonar.host.url", "https://sonarcloud.io")
+	}
+}
+
+sentry {
+	includeSourceContext.set(true)
+	org = "alexeycom"
+	projectName = "java-project-99"
+	includeDependenciesReport.set(true)
+	authToken = System.getenv("SENTRY_AUTH_TOKEN")
+
+	telemetry = false
+
+	tracingInstrumentation {
+		enabled = true
+	}
 }
