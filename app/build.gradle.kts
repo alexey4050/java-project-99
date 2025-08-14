@@ -88,7 +88,8 @@ sentry {
 	org = "alexeycom"
 	projectName = "java-project-99"
 	includeDependenciesReport.set(true)
-	authToken = System.getenv("SENTRY_AUTH_TOKEN")
+	//authToken = System.getenv("SENTRY_AUTH_TOKEN")
+	authToken = providers.environmentVariable("SENTRY_AUTH_TOKEN").getOrElse("")
 
 	telemetry = false
 

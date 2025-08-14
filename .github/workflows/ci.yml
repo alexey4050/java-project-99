@@ -5,13 +5,16 @@ on:
   pull_request:
     branches: [ main ]
 
+env:
+  SPRING_PROFILES_ACTIVE: test
+  SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+  SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  QLTY_COVERAGE_TOKEN: ${{ secrets.QLTY_COVERAGE_TOKEN }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-      SPRING_PROFILES_ACTIVE: dev
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -26,9 +29,6 @@ jobs:
         with:
           arguments: build
           build-root-directory: app
-
-      - name: Build with Gradle
-        run: ./gradlew build --no-daemon -Dsentry.auth.token=${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Run tests
         working-directory: ./app
@@ -60,17 +60,18 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./gradlew build sonar --info
 
-#      - name: Upload source context to Sentry
-#        if: github.ref == 'refs/heads/main'
-#        working-directory: ./app
-#        run: ./gradlew sentryBundleSources --info
-#        env:
-#            SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-#            SENTRY_LOG_LEVEL: debug
+      - name: Upload source context to Sentry
+        if: github.ref == 'refs/heads/main'
+        working-directory: ./app
+        run: ./gradlew sentryBundleSources --info
+        env:
+            SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+            ORG_GRADLE_PROJECT_sentryAuthToken: ${{ secrets.SENTRY_AUTH_TOKEN }}
+            SENTRY_LOG_LEVEL: debug
 
-#      - name: Build Docker image
-#        if: github.ref == 'refs/heads/main'
-#        run: |
-#          docker build -t my-app:latest ./app
-#          echo "SENTRY_DSN=$SENTRY_DSN" >> .env
-#          echo "SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN" >> .env
+      - name: Build Docker image
+        if: github.ref == 'refs/heads/main'
+        run: |
+          docker build -t my-app:latest ./app
+          echo "SENTRY_DSN=$SENTRY_DSN" >> .env
+          echo "SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN" >> .env
