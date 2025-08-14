@@ -6,6 +6,7 @@ on:
     branches: [ main ]
 
 env:
+  SPRING_PROFILES_ACTIVE: test
   SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
   SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
