@@ -1,3 +1,8 @@
+sentry:
+  dsn: ${SENTRY_DSN:}
+  environment: ${SENTRY_ENVIRONMENT:ci}
+  send-default-pii: true
+
 logging:
   level:
     org.springframework.web: DEBUG
@@ -24,6 +29,3 @@ rsa:
   public-key: classpath:certs/public.pem
   private-key: classpath:certs/private.pem
 
-sentry:
-  dsn: ${SENTRY_DSN:}
-  send-default-pii: true
