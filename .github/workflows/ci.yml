@@ -6,7 +6,6 @@ on:
     branches: [ main ]
 
 env:
-  SPRING_PROFILES_ACTIVE: test
   SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
   SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -62,15 +61,17 @@ jobs:
 
       - name: Upload source context to Sentry
         if: github.ref == 'refs/heads/main'
-        run: ./gradlew sentryBundleSources --info
+        run: |
+          echo "SENTRY_AUTH_TOKEN length: ${#SENTRY_AUTH_TOKEN}"
+          ./gradlew sentryBundleSources --info
         env:
             SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-            ORG_GRADLE_PROJECT_sentryAuthToken: ${{ secrets.SENTRY_AUTH_TOKEN }}
             SENTRY_LOG_LEVEL: debug
+            SENTRY_URL: https://sentry.io/
 
       - name: Build Docker image
         if: github.ref == 'refs/heads/main'
         run: |
           docker build -t my-app:latest 
-          echo "SENTRY_DSN=$SENTRY_DSN" >> .env
+          echo "SENTRY_DSN=$SENTRY_DSN" > .env
           echo "SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN" >> .env
