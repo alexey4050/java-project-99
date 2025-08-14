@@ -51,9 +51,6 @@ dependencies {
 	testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
 	testImplementation("net.javacrumbs.json-unit:json-unit-assertj:3.2.2")
 	testImplementation("org.instancio:instancio-junit:3.3.0")
-
-//	implementation("io.sentry:sentry-spring-boot-starter:8.19.1")
-//	implementation("io.sentry:sentry-logback:8.19.1")
 }
 
 tasks.withType<Test> {
