@@ -36,13 +36,9 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
-
 	implementation("org.mapstruct:mapstruct:1.5.5.Final")
 	annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
 	implementation("org.openapitools:jackson-databind-nullable:0.2.6")
-	runtimeOnly("org.postgresql:postgresql")
-	runtimeOnly("com.h2database:h2")
-
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -51,6 +47,9 @@ dependencies {
 	testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
 	testImplementation("net.javacrumbs.json-unit:json-unit-assertj:3.2.2")
 	testImplementation("org.instancio:instancio-junit:3.3.0")
+
+	runtimeOnly("org.postgresql:postgresql")
+	runtimeOnly("com.h2database:h2")
 }
 
 tasks.withType<Test> {
@@ -80,6 +79,8 @@ sonar {
 		property("sonar.projectKey", "alexey4050_java-project-99")
 		property("sonar.organization", "alexey4050")
 		property("sonar.host.url", "https://sonarcloud.io")
+		property("sonar.ce.timeout", "600000")
+		property("sonar.ws.timeout", "600000")
 	}
 }
 
