@@ -35,7 +35,7 @@ jobs:
         run: ./gradlew test
 
       - name: Generate coverage report
-        run: /gradlew -p ./app jacocoTestReport
+        run: make report
 
       - name: Upload to Qlty.sh
         uses: qltysh/qlty-action/coverage@v1
