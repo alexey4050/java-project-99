@@ -28,10 +28,8 @@ jobs:
       - uses: gradle/gradle-build-action@v2
         with:
           arguments: build
-          build-root-directory: app
 
       - name: Run tests
-        working-directory: ./app
         run: ./gradlew test
 
       - name: Generate coverage report
@@ -40,7 +38,7 @@ jobs:
       - name: Upload to Qlty.sh
         uses: qltysh/qlty-action/coverage@v1
         with:
-          files: /home/runner/work/java-project-99/java-project-99/app/build/reports/jacoco/test/jacocoTestReport.xml
+          files: /home/runner/work/java-project-99/java-project-99/build/reports/jacoco/test/jacocoTestReport.xml
           token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
 
       - name: Cache SonarQube packages
@@ -58,14 +56,12 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle
 
       - name: Build and analyze
-        working-directory: ./app
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./gradlew build sonar --info
 
       - name: Upload source context to Sentry
         if: github.ref == 'refs/heads/main'
-        working-directory: ./app
         run: ./gradlew sentryBundleSources --info
         env:
             SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
@@ -74,8 +70,7 @@ jobs:
 
       - name: Build Docker image
         if: github.ref == 'refs/heads/main'
-        working-directory: ./app
         run: |
-          docker build -t my-app:latest ./app
+          docker build -t my-app:latest 
           echo "SENTRY_DSN=$SENTRY_DSN" >> .env
           echo "SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN" >> .env

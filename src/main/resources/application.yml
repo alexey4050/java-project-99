@@ -1,0 +1,31 @@
+sentry:
+  dsn: ${SENTRY_DSN:}
+  environment: ${SENTRY_ENVIRONMENT:ci}
+  send-default-pii: true
+
+logging:
+  level:
+    org.springframework.web: DEBUG
+    hexlet.code: TRACE
+
+spring:
+  profiles:
+    activate: dev
+
+  jpa:
+    show-sql: true
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create
+    output:
+      ansi:
+        enabled: always
+
+server:
+  address: 0.0.0.0
+  port: ${PORT:8080}
+
+rsa:
+  public-key: classpath:certs/public.pem
+  private-key: classpath:certs/private.pem
+

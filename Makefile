@@ -1,22 +1,22 @@
 .PHONY: build
 
 checkstyleMain:
-	./app/gradlew -p ./app checkstyleMain
+	./gradlew checkstyleMain
 
 checkstyleTest:
-	./app/gradlew -p ./app checkstyleTest
+	./gradlew checkstyleTest
 
 build:
-	./app/gradlew -p ./app clean build
+	./gradlew clean build
 
 test:
-	./app/gradlew -p ./app test
+	./gradlew test
 
 report:
-	./app/gradlew -p ./app jacocoTestReport
+	./gradlew jacocoTestReport
 
 run:
-	./app/build/install/app/bin/app
+	./build/install/java-project-99/bin/java-project-99
 
 coverage:
-	./app/gradlew -p ./app jacocoTestCoverageVerification
+	./gradlew jacocoTestCoverageVerification
