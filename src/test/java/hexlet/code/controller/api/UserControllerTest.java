@@ -21,10 +21,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +31,6 @@ import java.util.Optional;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -88,11 +85,6 @@ public class UserControllerTest {
         labelRepository.deleteAll();
         statusRepository.deleteAll();
         userRepository.deleteAll();
-
-        mockMvc = MockMvcBuilders.webAppContextSetup(wac)
-                .defaultResponseCharacterEncoding(StandardCharsets.UTF_8)
-                .apply(springSecurity())
-                .build();
 
         testUser = Instancio.of(modelGenerator.getUserModel()).create();
         testUser = userRepository.save(testUser);
@@ -149,6 +141,7 @@ public class UserControllerTest {
         String validToken = jwtUtils.generateToken(testUser.getEmail());
 
         var request = get("/api/users/" + testUser.getId())
+                .with(token)
                 .header("Authorization", "Bearer " + validToken);
 
         mockMvc.perform(request)

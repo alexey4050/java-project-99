@@ -17,7 +17,7 @@ public class WelcomeControllerTest {
     private MockMvc mockMvc;
 
     @Test
-    public void testIWelcome() throws Exception {
+    public void testWelcome() throws Exception {
         mockMvc.perform(get("/welcome"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith("text/plain"))

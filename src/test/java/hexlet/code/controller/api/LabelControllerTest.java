@@ -15,7 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.HashMap;
@@ -59,10 +58,6 @@ public class LabelControllerTest {
     public void setup() {
         taskRepository.deleteAll();
         labelRepository.deleteAll();
-
-        mockMvc = MockMvcBuilders.webAppContextSetup(wac)
-                .apply(springSecurity())
-                .build();
 
         testLabel = new Label();
         testLabel.setName("bug");

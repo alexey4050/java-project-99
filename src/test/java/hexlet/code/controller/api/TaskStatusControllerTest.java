@@ -18,18 +18,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Optional;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -85,11 +82,6 @@ public class TaskStatusControllerTest {
         labelRepository.deleteAll();
         statusRepository.deleteAll();
         userRepository.deleteAll();
-
-        mockMvc = MockMvcBuilders.webAppContextSetup(wac)
-                .defaultResponseCharacterEncoding(StandardCharsets.UTF_8)
-                .apply(springSecurity())
-                .build();
 
         testStatus = genStatus("Test Status", "test-status");
         testStatus = statusRepository.save(testStatus);
