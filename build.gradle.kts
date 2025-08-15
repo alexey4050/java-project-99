@@ -89,17 +89,24 @@ sonar {
 	}
 }
 
+val sentryToken = System.getenv("SENTRY_AUTH_TOKEN") ?: "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"
+
 sentry {
 	includeSourceContext.set(true)
 	org = "alexeycom"
 	projectName = "java-project-99"
 	includeDependenciesReport.set(true)
-	authToken = System.getenv("SENTRY_AUTH_TOKEN") ?: ""
+	println("!!!!!! ----- SENTRY_AUTH_TOKEN is set: ${System.getenv("SENTRY_AUTH_TOKEN") != null}")
+	authToken = sentryToken
 	//authToken = providers.environmentVariable("SENTRY_AUTH_TOKEN").getOrElse("")
 
 	telemetry = false
 
 	tracingInstrumentation {
 		enabled = true
+	}
+
+	tasks.withType<JavaExec>().configureEach {
+		systemProperty("SENTRY_AUTH_TOKEN", System.getProperty("SENTRY_AUTH_TOKEN"))
 	}
 }

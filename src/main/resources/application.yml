@@ -1,6 +1,5 @@
 sentry:
-  dsn: ${SENTRY_DSN:}
-  environment: ${SENTRY_ENVIRONMENT:ci}
+  dsn: https://468e61e429ecbc02dc58fd1b1223752f@o4509842283233280.ingest.de.sentry.io/4509842553765968
   send-default-pii: true
 
 logging:
