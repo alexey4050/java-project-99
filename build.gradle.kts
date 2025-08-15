@@ -1,4 +1,5 @@
 plugins {
+	application
 	java
 	checkstyle
 	jacoco
@@ -11,6 +12,10 @@ plugins {
 
 group = "hexlet.code"
 version = "0.0.1-SNAPSHOT"
+
+application {
+	mainClass.set("hexlet.code.AppApplication")
+}
 
 java {
 	toolchain {

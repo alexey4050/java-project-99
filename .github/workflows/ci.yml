@@ -29,11 +29,6 @@ jobs:
         with:
           arguments: build
 
-      - name: Prepare test resources
-        run: |
-          mkdir -p src/test/resources/certs
-          cp src/main/resources/certs/*.pem src/test/resources/certs/
-
       - name: Run tests with debug
         run: |
           ./gradlew test --debug
