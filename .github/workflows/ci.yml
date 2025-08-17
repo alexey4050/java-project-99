@@ -33,7 +33,7 @@ jobs:
         run: ./gradlew build --no-daemon -Dsentry.auth.token=${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Run tests
-        run: ./gradlew test -Dspring.profiles.active=test --stacktrace --debug
+        run: /gradlew test -Dspring.profiles.active=test
 
       - name: Generate coverage report
         run: ./gradlew jacocoTestReport
@@ -48,7 +48,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
+          key: ${{ runner.os }}-sonar-${{ hashFiles('build.gradle') }}
           restore-keys: ${{ runner.os }}-sonar
 
       - name: Cache Gradle packages

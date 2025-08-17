@@ -143,7 +143,7 @@ public class TaskControllerTest {
                 .andExpect(jsonPath("$.id").value(testTask.getId()))
                 .andExpect(jsonPath("$.title").value(testTask.getName()))
                 .andExpect(jsonPath("$.status").value(testStatus.getSlug()))
-                .andExpect(jsonPath("$.labels[0]").value(testLabel.getId()));
+                .andExpect(jsonPath("$.taskLabelIds[0]").value(testLabel.getId()));
     }
 
     @Test
@@ -164,7 +164,7 @@ public class TaskControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value("Updated Task"))
                 .andExpect(jsonPath("$.content").value("Updated description"))
-                .andExpect(jsonPath("$.labels[0]").value(newLabel.getId()));
+                .andExpect(jsonPath("$.taskLabelIds[0]").value(newLabel.getId()));
 
         Task updatedTask = taskRepository.findById(testTask.getId()).orElseThrow();
         assertThat(updatedTask.getName()).isEqualTo("Updated Task");

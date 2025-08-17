@@ -91,6 +91,7 @@ sonar {
 		property("sonar.host.url", "https://sonarcloud.io")
 		property("sonar.ce.timeout", "600000")
 		property("sonar.ws.timeout", "600000")
+		property("sonar.ci.autoconfig.disabled", "true")
 	}
 }
 

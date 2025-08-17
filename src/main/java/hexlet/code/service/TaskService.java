@@ -59,8 +59,8 @@ public class TaskService {
                 .orElseThrow(() -> new ResourceNotFoundException("Task not found"));
         taskMapper.update(taskUpdateDTO, task);
 
-        if (taskUpdateDTO.getLabels() != null && taskUpdateDTO.getLabels().isPresent()) {
-            Set<Label> labels = new HashSet<>(labelRepository.findAllById(taskUpdateDTO.getLabels().get()));
+        if (taskUpdateDTO.getLabelsToIds() != null && taskUpdateDTO.getLabelsToIds().isPresent()) {
+            Set<Label> labels = new HashSet<>(labelRepository.findAllById(taskUpdateDTO.getLabelsToIds().get()));
             task.setLabels(labels);
         }
         return taskRepository.save(task);
