@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
 import java.util.UUID;
 
 @Component
@@ -57,7 +56,7 @@ public class ModelGenerator {
                 .supply(Select.field(Task::getName), () -> "Task-" + UUID.randomUUID())
                 .supply(Select.field(Task::getDescription), () -> "Description-" + UUID.randomUUID())
                 .supply(Select.field(Task::getIndex), () -> 1000)
-                .supply(Select.field(Task::getLabels), () -> new HashSet<>())
+                .ignore(Select.field(Task::getLabels))
                 .toModel();
     }
 }

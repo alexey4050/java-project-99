@@ -9,6 +9,7 @@ import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,13 +23,13 @@ import org.springframework.web.context.WebApplicationContext;
 import hexlet.code.util.ModelGenerator;
 
 import java.util.HashMap;
-//import java.util.HashSet;
-//import java.util.List;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -92,38 +93,35 @@ public class TaskControllerTest {
         testTask.setLabels(Set.of(testLabel));
         testTask = taskRepository.save(testTask);
 
-        testTask = taskRepository.save(testTask);
-
         token = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
     }
 
-//    @Test
-//    public void testCreateTask() throws Exception {
-//        Label newLabel = Instancio.of(modelGenerator.getLabelModel()).create();
-//        newLabel = labelRepository.save(newLabel);
-//
-//        var newTaskData = new HashMap<>();
-//        newTaskData.put("title", "New Task");
-//        newTaskData.put("content", "New description");
-//        newTaskData.put("assignee_id", testUser.getId());
-//        newTaskData.put("status", testStatus.getSlug());
-//        newTaskData.put("labels", List.of(newLabel.getId()));
-//
-//        var request = post("/api/tasks")
-//                .with(token)
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(om.writeValueAsString(newTaskData));
-//
-//        mockMvc.perform(request)
-//                .andExpect(status().isCreated())
-//                .andExpect(jsonPath("$.title").value("New Task"))
-//                .andExpect(jsonPath("$.content").value("New description"));
-//
-//        Task createdTask = taskRepository.findByName("New Task").orElseThrow();
-//        assertThat(createdTask.getDescription()).isEqualTo("New description");
-//        //assertThat(createdTask.getLabels()).hasSize(1);
-//        assertThat(createdTask.getLabels().iterator().next().getId()).isEqualTo(newLabel.getId());
-//    }
+    @Test
+    public void testCreateTask() throws Exception {
+        Label newLabel = Instancio.of(modelGenerator.getLabelModel()).create();
+        newLabel = labelRepository.save(newLabel);
+
+        var newTaskData = new HashMap<>();
+        newTaskData.put("title", "New Task");
+        newTaskData.put("content", "New description");
+        newTaskData.put("assignee_id", testUser.getId());
+        newTaskData.put("status", testStatus.getSlug());
+        newTaskData.put("taskLabelIds", List.of(newLabel.getId()));
+
+        var request = post("/api/tasks")
+                .with(token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(newTaskData));
+
+        mockMvc.perform(request)
+                .andExpect(status().isCreated());
+
+        Task createdTask = taskRepository.findByName("New Task").orElse(null);
+        assertNotNull(createdTask);
+        assertThat(createdTask.getDescription()).isEqualTo("New description");
+        assertThat(createdTask.getLabels()).isNotNull();
+        assertThat(createdTask.getLabels().iterator().next().getId()).isEqualTo(newLabel.getId());
+    }
 
     @Test
     public void testCreateTaskUnauthorized() throws Exception {
@@ -149,10 +147,15 @@ public class TaskControllerTest {
     }
 
     @Test
+    @Transactional
     public void testUpdateTask() throws Exception {
+        Label newLabel = Instancio.of(modelGenerator.getLabelModel()).create();
+        newLabel = labelRepository.save(newLabel);
+
         Map<String, Object> updateData = new HashMap<>();
         updateData.put("title", "Updated Task");
         updateData.put("content", "Updated description");
+        updateData.put("taskLabelIds", List.of(newLabel.getId()));
 
         mockMvc.perform(put("/api/tasks/" + testTask.getId())
                         .with(token)
@@ -160,11 +163,13 @@ public class TaskControllerTest {
                         .content(om.writeValueAsString(updateData)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value("Updated Task"))
-                .andExpect(jsonPath("$.content").value("Updated description"));
+                .andExpect(jsonPath("$.content").value("Updated description"))
+                .andExpect(jsonPath("$.labels[0]").value(newLabel.getId()));
 
         Task updatedTask = taskRepository.findById(testTask.getId()).orElseThrow();
         assertThat(updatedTask.getName()).isEqualTo("Updated Task");
         assertThat(updatedTask.getDescription()).isEqualTo("Updated description");
+        assertThat(updatedTask.getLabels().iterator().next().getId()).isEqualTo(newLabel.getId());
     }
 
     @Test

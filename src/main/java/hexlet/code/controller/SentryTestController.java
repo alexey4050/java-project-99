@@ -1,4 +1,4 @@
-package hexlet.code.controller.api;
+package hexlet.code.controller;
 
 import io.sentry.Sentry;
 import org.springframework.web.bind.annotation.GetMapping;

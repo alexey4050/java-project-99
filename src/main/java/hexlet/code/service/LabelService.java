@@ -1,8 +1,8 @@
 package hexlet.code.service;
 
-import hexlet.code.dto.LabelCreateDTO;
-import hexlet.code.dto.LabelDTO;
-import hexlet.code.dto.LabelUpdateDTO;
+import hexlet.code.dto.label.LabelCreateDTO;
+import hexlet.code.dto.label.LabelDTO;
+import hexlet.code.dto.label.LabelUpdateDTO;
 import hexlet.code.exception.LabelAssociatedException;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.LabelMapper;
@@ -53,7 +53,7 @@ public class LabelService {
     }
 
     public void delete(Long id) {
-        var label = labelRepository.findById(id)
+        labelRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("label not found"));
 
         if (taskRepository.existsByLabelsId(id)) {

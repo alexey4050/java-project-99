@@ -6,7 +6,7 @@ plugins {
 	id("org.springframework.boot") version "3.5.4"
 	id("io.spring.dependency-management") version "1.1.7"
 	id("io.freefair.lombok") version "8.6"
-	id("org.sonarqube") version "6.2.0.5505"
+	id("org.sonarqube") version "5.0.0.4638"
 	id("io.sentry.jvm.gradle") version "5.9.0"
 }
 
@@ -34,31 +34,36 @@ repositories {
 }
 
 dependencies {
+	// Spring Boot
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
-	implementation("org.springframework.boot:spring-boot-starter-security")
-	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+
+	// MapStruct + Lombok интеграция
 	implementation("org.mapstruct:mapstruct:1.5.5.Final")
 	annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
+	annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
+
+	// Документация
 	implementation("org.openapitools:jackson-databind-nullable:0.2.6")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9")
 
+	// Тестирование
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
-	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-	testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
 	testImplementation("net.javacrumbs.json-unit:json-unit-assertj:3.2.2")
 	testImplementation("org.instancio:instancio-junit:3.3.0")
 
+	// Базы данных
 	runtimeOnly("org.postgresql:postgresql")
 	runtimeOnly("com.h2database:h2")
 }
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+	systemProperty("spring.profiles.active", "test")
 }
 
 jacoco {
@@ -96,12 +101,10 @@ sentry {
 	org = "alexeycom"
 	projectName = "java-project-99"
 	includeDependenciesReport.set(true)
-	println("!!!!!! ----- SENTRY_AUTH_TOKEN is set: ${System.getenv("SENTRY_AUTH_TOKEN") != null}")
+	println("SENTRY_AUTH_TOKEN is set: ${System.getenv("SENTRY_AUTH_TOKEN") != null}")
 	authToken = sentryToken
 	//authToken = providers.environmentVariable("SENTRY_AUTH_TOKEN").getOrElse("")
-
 	telemetry = false
-
 	tracingInstrumentation {
 		enabled = true
 	}

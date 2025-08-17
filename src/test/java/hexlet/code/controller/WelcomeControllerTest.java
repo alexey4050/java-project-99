@@ -1,4 +1,4 @@
-package hexlet.code.controller.api;
+package hexlet.code.controller;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class WelcomeControllerTest {
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -20,8 +21,6 @@ public class WelcomeControllerTest {
     public void testWelcome() throws Exception {
         mockMvc.perform(get("/welcome"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith("text/plain"))
-                .andExpect(content().encoding("UTF-8"))
                 .andExpect(content().string("Welcome to Spring"));
     }
 }

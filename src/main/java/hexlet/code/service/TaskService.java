@@ -1,8 +1,8 @@
 package hexlet.code.service;
 
-import hexlet.code.dto.TaskCreateDTO;
-import hexlet.code.dto.TaskFilterParams;
-import hexlet.code.dto.TaskUpdateDTO;
+import hexlet.code.dto.task.TaskCreateDTO;
+import hexlet.code.dto.task.TaskFilterParams;
+import hexlet.code.dto.task.TaskUpdateDTO;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.TaskMapper;
 import hexlet.code.model.Label;
@@ -51,16 +51,6 @@ public class TaskService {
 
     public Task create(TaskCreateDTO taskCreateDTO) {
         Task task = taskMapper.map(taskCreateDTO);
-
-        if (taskCreateDTO.getLabels() != null) {
-            Set<Label> labels = new HashSet<>();
-            for (Long labelId : taskCreateDTO.getLabels()) {
-                Label label = labelRepository.findById(labelId)
-                        .orElseThrow(() -> new ResourceNotFoundException("Label not found"));
-                labels.add(label);
-            }
-            task.setLabels(labels);
-        }
         return taskRepository.save(task);
     }
 
@@ -69,16 +59,10 @@ public class TaskService {
                 .orElseThrow(() -> new ResourceNotFoundException("Task not found"));
         taskMapper.update(taskUpdateDTO, task);
 
-        if (taskUpdateDTO.getLabels() != null) {
-            Set<Label> labels = new HashSet<>();
-            for (Long labelId : taskUpdateDTO.getLabels().get()) {
-                Label label = labelRepository.findById(labelId)
-                        .orElseThrow(() -> new ResourceNotFoundException("Label not found"));
-                labels.add(label);
-            }
+        if (taskUpdateDTO.getLabels() != null && taskUpdateDTO.getLabels().isPresent()) {
+            Set<Label> labels = new HashSet<>(labelRepository.findAllById(taskUpdateDTO.getLabels().get()));
             task.setLabels(labels);
         }
-
         return taskRepository.save(task);
     }
 
@@ -86,8 +70,7 @@ public class TaskService {
         var task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task not found"));
         task.getLabels().clear();
-        taskRepository.save(task);
-        taskRepository.deleteById(id);
+        taskRepository.delete(task);
     }
 
     public List<Task> getAllFiltered(TaskFilterParams filterParams) {

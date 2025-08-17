@@ -1,8 +1,8 @@
 package hexlet.code.mapper;
 
-import hexlet.code.dto.TaskCreateDTO;
-import hexlet.code.dto.TaskDTO;
-import hexlet.code.dto.TaskUpdateDTO;
+import hexlet.code.dto.task.TaskCreateDTO;
+import hexlet.code.dto.task.TaskDTO;
+import hexlet.code.dto.task.TaskUpdateDTO;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.model.Label;
 import hexlet.code.model.Task;
@@ -48,7 +48,7 @@ public abstract class TaskMapper {
     @Mapping(target = "description", source = "description")
     @Mapping(target = "taskStatus", source = "status", qualifiedByName = "slugToStatus")
     @Mapping(target = "assignee", source = "assigneeId", qualifiedByName = "idToUser")
-    @Mapping(target = "labels", ignore = true)
+    @Mapping(target = "labels", source = "labels", qualifiedByName = "idsToLabels")
     public abstract Task map(TaskCreateDTO dto);
 
     @Mapping(source = "name", target = "title")
@@ -90,7 +90,7 @@ public abstract class TaskMapper {
     @Named("idsToLabels")
     public Set<Label> idsToLabels(List<Long> labelIds) {
         if (labelIds == null) {
-            return null;
+            return new HashSet<>();
         }
         return new HashSet<>(labelRepository.findAllById(labelIds));
     }
@@ -98,7 +98,7 @@ public abstract class TaskMapper {
     @Named("labelsToIds")
     public List<Long> labelsToIds(Set<Label> labels) {
         if (labels == null) {
-            return null;
+            return List.of();
         }
         return labels.stream()
                 .map(Label::getId)

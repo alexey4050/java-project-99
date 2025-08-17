@@ -1,9 +1,9 @@
 package hexlet.code.controller.api;
 
-import hexlet.code.dto.TaskCreateDTO;
-import hexlet.code.dto.TaskDTO;
-import hexlet.code.dto.TaskFilterParams;
-import hexlet.code.dto.TaskUpdateDTO;
+import hexlet.code.dto.task.TaskCreateDTO;
+import hexlet.code.dto.task.TaskDTO;
+import hexlet.code.dto.task.TaskFilterParams;
+import hexlet.code.dto.task.TaskUpdateDTO;
 import hexlet.code.mapper.TaskMapper;
 import hexlet.code.service.TaskService;
 import jakarta.validation.Valid;
@@ -34,6 +34,7 @@ public class TaskController {
     private TaskMapper taskMapper;
 
     @GetMapping("/tasks")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<TaskDTO>> index(
             @RequestParam(required = false) String titleCont,
             @RequestParam(required = false) Long assigneeId,

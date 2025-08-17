@@ -1,8 +1,8 @@
 package hexlet.code.controller.api;
 
-import hexlet.code.dto.LabelCreateDTO;
-import hexlet.code.dto.LabelDTO;
-import hexlet.code.dto.LabelUpdateDTO;
+import hexlet.code.dto.label.LabelCreateDTO;
+import hexlet.code.dto.label.LabelDTO;
+import hexlet.code.dto.label.LabelUpdateDTO;
 import hexlet.code.service.LabelService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +29,7 @@ public class LabelController {
     private LabelService labelService;
 
     @GetMapping("/labels")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<LabelDTO>> index() {
         var labels = labelService.getAll();
         return ResponseEntity.ok()
@@ -38,6 +39,7 @@ public class LabelController {
 
     @GetMapping("/labels/{id}")
     public LabelDTO show(@PathVariable Long id) {
+
         return labelService.findById(id);
     }
 
@@ -45,6 +47,7 @@ public class LabelController {
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("isAuthenticated()")
     public LabelDTO create(@Valid @RequestBody LabelCreateDTO labelData) {
+
         return labelService.create(labelData);
     }
 
