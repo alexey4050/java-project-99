@@ -73,9 +73,9 @@ jobs:
         env:
           SENTRY_LOG_LEVEL: debug
 
-      - name: Build Docker image
-        if: github.ref == 'refs/heads/main'
-        run: |
-          docker build -t my-app:latest 
-          echo "SENTRY_DSN=$SENTRY_DSN" > .env
-          echo "SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN" >> .env
+#      - name: Build Docker image
+#        if: github.ref == 'refs/heads/main'
+#        run: |
+#          docker build -t my-app:latest
+#          echo "SENTRY_DSN=$SENTRY_DSN" > .env
+#          echo "SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN" >> .env

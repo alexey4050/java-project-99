@@ -1,8 +1,12 @@
 FROM eclipse-temurin:21-jdk AS build
 
+WORKDIR /app
+
 RUN ./gradlew dependencies --no-daemon
 
 COPY . .
+
+RUN chmod +x gradlew || true
 
 RUN ./gradlew build --no-daemon
 
