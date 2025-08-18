@@ -57,7 +57,7 @@
 
 ## 📊 Модель данных
 
-![Схема модели данных](file_presentation/Schema Task manager.png)
+![](file_presentation/Schema-task-manager.png)
 
 ### Основные сущности:
 * Пользователи - управление учетными записями
@@ -69,4 +69,4 @@
 
 Ошибки отслеживаются на Sentry:
 
-![Ошибки на Sentry](file_presentation/Errors sentry.png)
+![](file_presentation/Errors-sentry.png)

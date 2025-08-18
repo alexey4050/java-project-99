@@ -1,19 +1,12 @@
 FROM eclipse-temurin:21-jdk AS build
 
 WORKDIR /app
-
-RUN ./gradlew dependencies --no-daemon
-
 COPY . .
+RUN apk add --no-cache bash && \
+    chmod +x gradlew && \
+    ./gradlew build --no-daemon
 
-RUN chmod +x gradlew || true
-
-RUN ./gradlew build --no-daemon
-
-FROM eclipse-temurin:21-jdk
-
-COPY --from=build build/libs/app-*.jar app.jar
-
+FROM eclipse-temurin:21-jre-alpine
+COPY --from=0 /app/build/libs/*.jar app.jar
 EXPOSE 8080
-
 ENTRYPOINT ["java", "-jar", "app.jar"]
