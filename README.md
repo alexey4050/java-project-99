@@ -70,3 +70,7 @@
 Ошибки отслеживаются на Sentry:
 
 ![](file_presentation/Errors-sentry.png)
+
+Полная документация API доступна через Swagger UI:  
+📖 [Swagger UI](https://java-project-99-04s6.onrender.com/swagger-ui.html)
+![](file_presentation/Swagger-UI.png)
