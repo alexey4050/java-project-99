@@ -6,8 +6,6 @@ build/
 !**/src/test/**/build/
 .gradle
 build
-private.pem
-public.pem
 /native
 /.tmp
 /daemon
