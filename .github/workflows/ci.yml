@@ -73,9 +73,14 @@ jobs:
         env:
           SENTRY_LOG_LEVEL: debug
 
-#      - name: Build Docker image
-#        if: github.ref == 'refs/heads/main'
-#        run: |
-#          docker build -t my-app:latest
-#          echo "SENTRY_DSN=$SENTRY_DSN" > .env
-#          echo "SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN" >> .env
+      - name: Build Docker image
+        run: docker build -t java-task-manager:latest .
+
+      - name: Test Docker image
+        run: |
+          echo "=== Checking Docker images ==="
+          docker images
+          echo "=== Checking app directory structure ==="
+          docker run --rm java-task-manager:latest ls -la /app
+          echo "=== Checking JAR file exists ==="
+          docker run --rm java-task-manager:latest ls -la /app/app.jar

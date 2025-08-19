@@ -1,6 +1,5 @@
 plugins {
 	application
-	java
 	checkstyle
 	jacoco
 	id("org.springframework.boot") version "3.5.4"

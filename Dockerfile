@@ -1,14 +1,23 @@
 FROM eclipse-temurin:21-jdk AS build
 
-ARG SENTRY_AUTH_TOKEN
-ENV SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
+# Создаём рабочую директорию в контейнере
+WORKDIR /app
 
-WORKDIR /
+# Копируем ВСЕ файлы из текущей директории
+# В директорию /app внутри контейнера
+COPY . .
 
-COPY / .
+# Теперь все команды выполняются в /app
+RUN ./gradlew build --no-daemon
 
-RUN ./gradlew installDist
+# Финальный образ
+FROM eclipse-temurin:21-jre-alpine
 
-CMD ./build/install/app/bin/app
+# Создаём рабочую директорию
+WORKDIR /app
 
-ENV SPRING_PROFILES_ACTIVE=prod
+# Копируем JAR из стадии build
+COPY --from=build /app/build/libs/*.jar app.jar
+
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
