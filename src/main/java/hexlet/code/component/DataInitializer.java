@@ -6,7 +6,7 @@ import hexlet.code.model.User;
 import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,19 +17,13 @@ import java.util.List;
 import java.util.Map;
 
 @Component
+@AllArgsConstructor
 public class DataInitializer implements ApplicationRunner {
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private TaskStatusRepository statusRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private LabelRepository labelRepository;
+    private final UserRepository userRepository;
+    private final TaskStatusRepository statusRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final LabelRepository labelRepository;
 
     @Override
     public void run(ApplicationArguments args) {

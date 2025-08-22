@@ -1,6 +1,7 @@
 package hexlet.code.controller.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hexlet.code.mapper.TaskMapper;
 import hexlet.code.model.Label;
 import hexlet.code.model.Task;
 import hexlet.code.model.TaskStatus;
@@ -35,6 +36,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -64,6 +66,9 @@ public class TaskControllerTest {
 
     @Autowired
     private ModelGenerator modelGenerator;
+
+    @Autowired
+    private TaskMapper taskMapper;
 
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
     private User testUser;
@@ -137,13 +142,12 @@ public class TaskControllerTest {
 
     @Test
     public void testGetTaskById() throws Exception {
+        var expectedDTO = taskMapper.map(testTask);
+
         mockMvc.perform(get("/api/tasks/" + testTask.getId())
                         .with(token))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(testTask.getId()))
-                .andExpect(jsonPath("$.title").value(testTask.getName()))
-                .andExpect(jsonPath("$.status").value(testStatus.getSlug()))
-                .andExpect(jsonPath("$.taskLabelIds[0]").value(testLabel.getId()));
+                .andExpect(content().json(om.writeValueAsString(expectedDTO)));
     }
 
     @Test

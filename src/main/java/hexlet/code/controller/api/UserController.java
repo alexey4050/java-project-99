@@ -4,12 +4,11 @@ import hexlet.code.dto.user.UserCreateDTO;
 import hexlet.code.dto.user.UserDTO;
 import hexlet.code.dto.user.UserUpdateDTO;
 import hexlet.code.service.UserService;
-import hexlet.code.utils.UserUtils;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,13 +24,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
+@AllArgsConstructor
 public class UserController {
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private UserUtils userUtils;
+    private final UserService userService;
 
     @GetMapping("/users")
     @ResponseStatus(HttpStatus.OK)

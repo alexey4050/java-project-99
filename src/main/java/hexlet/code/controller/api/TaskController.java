@@ -7,10 +7,9 @@ import hexlet.code.dto.task.TaskUpdateDTO;
 import hexlet.code.mapper.TaskMapper;
 import hexlet.code.service.TaskService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,12 +25,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
+@AllArgsConstructor
 public class TaskController {
-    @Autowired
-    private TaskService taskService;
 
-    @Autowired
-    private TaskMapper taskMapper;
+    private final TaskService taskService;
+    private final TaskMapper taskMapper;
 
     @GetMapping("/tasks")
     @ResponseStatus(HttpStatus.OK)
@@ -63,7 +61,6 @@ public class TaskController {
     }
 
     @PostMapping("/tasks")
-    @PreAuthorize("isAuthenticated()")
     @ResponseStatus(HttpStatus.CREATED)
     public TaskDTO create(@Valid @RequestBody TaskCreateDTO taskCreateDTO) {
         var task = taskService.create(taskCreateDTO);
@@ -78,7 +75,6 @@ public class TaskController {
 
     @DeleteMapping("/tasks/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("isAuthenticated()")
     public void delete(@PathVariable Long id) {
         taskService.delete(id);
     }

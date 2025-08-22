@@ -1,6 +1,8 @@
 sentry:
   dsn: https://468e61e429ecbc02dc58fd1b1223752f@o4509842283233280.ingest.de.sentry.io/4509842553765968
   send-default-pii: true
+  auth:
+    token: ${SENTRY_AUTH_TOKEN}
 
 logging:
   level:
@@ -8,6 +10,8 @@ logging:
     hexlet.code: TRACE
 
 spring:
+  application:
+    name: app
   profiles:
     activate: dev
 

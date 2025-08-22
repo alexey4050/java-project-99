@@ -1,6 +1,9 @@
 package hexlet.code.controller.api;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hexlet.code.dto.label.LabelDTO;
+import hexlet.code.mapper.LabelMapper;
 import hexlet.code.model.Label;
 import hexlet.code.model.Task;
 import hexlet.code.model.TaskStatus;
@@ -18,6 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -28,6 +32,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -46,6 +52,9 @@ public class LabelControllerTest {
 
     @Autowired
     private TaskStatusRepository taskStatusRepository;
+
+    @Autowired
+    private LabelMapper labelMapper;
 
     @Autowired
     private ObjectMapper om;
@@ -79,11 +88,17 @@ public class LabelControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(labelData));
 
-        mockMvc.perform(request)
-                .andExpect(status().isCreated());
+        var response = mockMvc.perform(request)
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse();
+
+        LabelDTO createdDTO = om.readValue(response.getContentAsString(), LabelDTO.class);
+        assertThat(createdDTO.getName()).isEqualTo("feature");
 
         Optional<Label> createdLabel = labelRepository.findByName("feature");
         assertThat(createdLabel).isPresent();
+        assertThat(createdLabel.get().getName()).isEqualTo("feature");
     }
 
     @Test
@@ -101,28 +116,37 @@ public class LabelControllerTest {
 
     @Test
     public void testGetLabelById() throws Exception {
+        var expectedDTO = labelMapper.map(testLabel);
+
         var request = get("/api/labels/" + testLabel.getId())
                 .with(token);
 
         mockMvc.perform(request)
                 .andExpect(status().isOk())
-                .andExpect(result -> {
-                    String content = result.getResponse().getContentAsString();
-                    assertThat(content).contains("\"id\":" + testLabel.getId());
-                    assertThat(content).contains("\"name\":\"bug\"");
-                });
+                .andExpect(content().json(om.writeValueAsString(expectedDTO)));
     }
 
     @Test
     public void testGetAllLabels() throws Exception {
+        List<Label> dbLabels = labelRepository.findAll();
+        List<LabelDTO> expectedDTOs = dbLabels.stream()
+                .map(labelMapper::map)
+                .toList();
         var request = get("/api/labels")
                 .with(token);
 
         mockMvc.perform(request)
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(expectedDTOs.size()))
                 .andExpect(result -> {
                     String content = result.getResponse().getContentAsString();
-                    assertThat(content).contains("bug");
+                    List<LabelDTO> actualDTOs = om.readValue(content, new TypeReference<>() {
+                    });
+
+                    assertThat(actualDTOs)
+                            .usingRecursiveComparison()
+                            .isEqualTo(expectedDTOs);
                 });
     }
 
@@ -135,8 +159,14 @@ public class LabelControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(updateData));
 
-        mockMvc.perform(request)
-                .andExpect(status().isOk());
+        var response = mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse();
+
+        LabelDTO updatedDTO = om.readValue(response.getContentAsString(), LabelDTO.class);
+        assertThat(updatedDTO.getName()).isEqualTo("critical-bug");
+        assertThat(updatedDTO.getId()).isEqualTo(testLabel.getId());
 
         Label updatedLabel = labelRepository.findById(testLabel.getId()).orElseThrow();
         assertThat(updatedLabel.getName()).isEqualTo("critical-bug");

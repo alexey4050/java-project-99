@@ -1,7 +1,7 @@
 package hexlet.code.config;
 
-import hexlet.code.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import hexlet.code.service.impl.UserServiceImpl;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -22,10 +22,10 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
+@AllArgsConstructor
 public class SecurityConfig {
 
-    @Autowired
-    private JwtDecoder jwtDecoder;
+    private final JwtDecoder jwtDecoder;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
@@ -62,7 +62,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationProvider daoAuthProvider(PasswordEncoder passwordEncoder,
-                                                  UserService userService) {
+                                                  UserServiceImpl userService) {
         var provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(userService);
         provider.setPasswordEncoder(passwordEncoder);

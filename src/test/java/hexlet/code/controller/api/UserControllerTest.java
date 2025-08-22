@@ -1,6 +1,5 @@
 package hexlet.code.controller.api;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.dto.user.UserDTO;
 import hexlet.code.mapper.UserMapper;
@@ -35,9 +34,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -71,7 +69,6 @@ public class UserControllerTest {
 
     @Autowired
     private TaskStatusRepository statusRepository;
-
 
     @Autowired
     private ModelGenerator modelGenerator;
@@ -110,8 +107,15 @@ public class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(data));
 
-        mockMvc.perform(request)
-                .andExpect(status().isCreated());
+        var response = mockMvc.perform(request)
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse();
+
+        UserDTO createdDTO = om.readValue(response.getContentAsString(), UserDTO.class);
+        assertThat(createdDTO.getEmail()).isEqualTo(newUser.getEmail());
+        assertThat(createdDTO.getFirstName()).isEqualTo(newUser.getFirstName());
+        assertThat(createdDTO.getLastName()).isEqualTo(newUser.getLastName());
 
         Optional<User> createdUser = userRepository.findByEmail(newUser.getEmail());
         assertTrue(createdUser.isPresent());
@@ -124,31 +128,29 @@ public class UserControllerTest {
         anotherUser.setPassword(passwordEncoder.encode("password456"));
         userRepository.save(anotherUser);
 
-        var request = get("/api/users").with(token);
-        var result = mockMvc.perform(request)
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse();
+        List<User> expectedUsers = userRepository.findAll();
+        List<UserDTO> expectedDTOs = expectedUsers.stream()
+                .map(userMapper::map)
+                .toList();
 
-        var body = result.getContentAsString();
-        List<UserDTO> userDTOs = om.readValue(body, new TypeReference<>() { });
-        assertThat(userDTOs).hasSize(2);
+        var request = get("/api/users").with(token);
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(content().json(om.writeValueAsString(expectedDTOs)));
     }
 
 
     @Test
     public void testGetUserById() throws Exception {
-        String validToken = jwtUtils.generateToken(testUser.getEmail());
+        var expectedDTO = userMapper.map(testUser);
 
         var request = get("/api/users/" + testUser.getId())
-                .with(token)
-                .header("Authorization", "Bearer " + validToken);
+                .with(token);
 
         mockMvc.perform(request)
-                .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(testUser.getId()))
-                .andExpect(jsonPath("$.email").value(testUser.getEmail()));
+                .andExpect(content().json(om.writeValueAsString(expectedDTO)));
     }
 
     @Test
@@ -163,12 +165,18 @@ public class UserControllerTest {
         var data = new HashMap<>();
         data.put("firstName", "UpdatedName");
 
-        var request = put("/api/users/" + testUser.getId())
-                .with(token)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(data));
+        var response = mockMvc.perform(put("/api/users/" + testUser.getId())
+                        .with(token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(data)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse();
 
-        mockMvc.perform(request).andExpect(status().isOk());
+        UserDTO updatedDTO = om.readValue(response.getContentAsString(), UserDTO.class);
+        assertThat(updatedDTO.getFirstName()).isEqualTo("UpdatedName");
+        assertThat(updatedDTO.getLastName()).isEqualTo(testUser.getLastName());
+        assertThat(updatedDTO.getEmail()).isEqualTo(testUser.getEmail());
 
         User updatedUser = userRepository.findById(testUser.getId()).orElseThrow();
         assertThat(updatedUser.getFirstName()).isEqualTo("UpdatedName");
@@ -183,12 +191,18 @@ public class UserControllerTest {
         data.put("lastName", "User");
         data.put("password", "newpassword123");
 
-        var request = put("/api/users/" + testUser.getId())
-                .with(token)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(data));
+        var response = mockMvc.perform(put("/api/users/" + testUser.getId())
+                        .with(token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(data)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse();
 
-        mockMvc.perform(request).andExpect(status().isOk());
+        UserDTO updatedDTO = om.readValue(response.getContentAsString(), UserDTO.class);
+        assertThat(updatedDTO.getEmail()).isEqualTo("updated@example.com");
+        assertThat(updatedDTO.getFirstName()).isEqualTo("Updated");
+        assertThat(updatedDTO.getLastName()).isEqualTo("User");
 
         User updatedUser = userRepository.findById(testUser.getId()).orElseThrow();
         assertThat(updatedUser.getEmail()).isEqualTo("updated@example.com");

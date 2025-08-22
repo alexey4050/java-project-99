@@ -44,7 +44,6 @@ public class ModelGenerator {
         return Instancio.of(Label.class)
                 .ignore(Select.field(Label::getId))
                 .ignore(Select.field(Label::getCreatedAt))
-                .ignore(Select.field(Label::getTasks))
                 .supply(Select.field(Label::getName), () -> "Label-" + UUID.randomUUID())
                 .toModel();
     }

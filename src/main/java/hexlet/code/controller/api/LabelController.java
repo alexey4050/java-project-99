@@ -5,10 +5,9 @@ import hexlet.code.dto.label.LabelDTO;
 import hexlet.code.dto.label.LabelUpdateDTO;
 import hexlet.code.service.LabelService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,10 +22,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
+@AllArgsConstructor
 public class LabelController {
 
-    @Autowired
-    private LabelService labelService;
+    private final LabelService labelService;
 
     @GetMapping("/labels")
     @ResponseStatus(HttpStatus.OK)
@@ -45,14 +44,12 @@ public class LabelController {
 
     @PostMapping("/labels")
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("isAuthenticated()")
     public LabelDTO create(@Valid @RequestBody LabelCreateDTO labelData) {
 
         return labelService.create(labelData);
     }
 
     @PutMapping("/labels/{id}")
-    @PreAuthorize("isAuthenticated()")
     public LabelDTO update(@Valid @RequestBody LabelUpdateDTO labelData,
                            @PathVariable Long id) {
         return labelService.update(labelData, id);

@@ -5,10 +5,9 @@ import hexlet.code.dto.task.TaskStatusDTO;
 import hexlet.code.dto.task.TaskStatusUpdateDTO;
 import hexlet.code.service.TaskStatusService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,10 +22,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
+@AllArgsConstructor
 public class TaskStatusController {
 
-    @Autowired
-    private TaskStatusService statusService;
+    private final TaskStatusService statusService;
 
     @GetMapping("/task_statuses")
     @ResponseStatus(HttpStatus.OK)
@@ -44,14 +43,12 @@ public class TaskStatusController {
 
     @PostMapping("/task_statuses")
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("isAuthenticated()")
     public TaskStatusDTO create(@Valid @RequestBody TaskStatusCreateDTO statusData) {
         return statusService.create(statusData);
     }
 
     @PutMapping("/task_statuses/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("isAuthenticated()")
     public TaskStatusDTO update(@Valid @RequestBody TaskStatusUpdateDTO statusData,
                                 @PathVariable Long id) {
         return statusService.update(statusData, id);
@@ -59,7 +56,6 @@ public class TaskStatusController {
 
     @DeleteMapping("/task_statuses/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("isAuthenticated()")
     public void delete(@PathVariable Long id) {
         statusService.delete(id);
     }
